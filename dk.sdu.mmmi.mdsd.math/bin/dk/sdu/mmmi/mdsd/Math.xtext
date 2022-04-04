@@ -1,0 +1,39 @@
+grammar dk.sdu.mmmi.mdsd.Math with org.eclipse.xtext.common.Terminals
+
+generate math "http://www.sdu.dk/mmmi/mdsd/Math"
+
+MathExp:
+    'var' name=ID '=' exp=Exp
+    EOL?
+    (nextExp=MathExp)?
+;
+terminal EOL:
+	('\r'? '\n')
+;
+ 
+Exp returns Expression:
+    Factor (('+' {Plus.left=current} | '-'{Minus.left=current}) right=Factor)*
+;
+
+Factor returns Expression:
+	 Primary (('*'{Multiplication.left=current} | '/'{Division.left=current}) right=Primary)*
+;
+Primary returns Expression:
+	Number | Parenthesis | VariableUse | LetBinding
+;
+
+Parenthesis returns Expression:
+	'(' Exp')'
+;
+
+LetBinding:
+	{Let} 'let' name=ID '=' first=Exp  "in" second=Exp "end"
+;
+
+Number:
+	value=INT
+;
+
+VariableUse:
+	{Var} id=ID
+;
